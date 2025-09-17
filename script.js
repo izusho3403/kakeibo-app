@@ -4,6 +4,9 @@ const totalIncome = document.getElementById("totalIncome");
 const totalExpense = document.getElementById("totalExpense");
 const balance = document.getElementById("balance");
 
+// 自分のGASのURLをここに貼る
+const GAS_URL = "https://script.google.com/macros/s/AKfycbytzvj-UQwOtd_WeCgmrlpE2Y9yjKhI7DlA-jZzXB3p57xDo1HIPelTR7kDxNHdQLaPkg/exec";
+
 let income = 0;
 let expense = 0;
 
@@ -28,19 +31,30 @@ form.addEventListener("submit", function(e) {
   const amount = parseInt(document.getElementById("amount").value);
   const type = document.getElementById("type").value;
 
+  // ページ上の一覧に追加
   const li = document.createElement("li");
   li.textContent = `${item}: ${amount}円 (${type === "income" ? "収入" : "支出"})`;
   list.appendChild(li);
 
+  // 合計を更新
   if (type === "income") {
     income += amount;
   } else {
     expense += amount;
   }
-
   updateSummary();
   updateChart();
 
+  // 🔹 Googleスプレッドシートに送信
+  fetch(GAS_URL, {
+    method: "POST",
+    body: JSON.stringify({ item, amount, type })
+  })
+  .then(res => res.text())
+  .then(data => console.log("シートに保存:", data))
+  .catch(err => console.error("エラー:", err));
+
+  // フォームをリセット
   form.reset();
 });
 
