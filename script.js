@@ -1,4 +1,4 @@
-// Apps ScriptのURLに置き換えてください
+// ここに自分のApps ScriptのURLを貼る
 const scriptURL = "https://script.google.com/macros/s/AKfycby3VrNFitYAzCdOw74r0E5nq7sfVwnWdLnO5fTsbBIUccKqDYaAwn4hLDE1i-vcZKUCmA/exec";
 
 // データ管理用
@@ -30,7 +30,7 @@ function initCharts() {
 
 // データ更新
 function updateDisplay() {
-  // 表
+  // 表の更新
   table.innerHTML = `
     <tr>
       <th>日付</th><th>区分</th><th>項目</th><th>金額</th>
@@ -43,9 +43,9 @@ function updateDisplay() {
     row.insertCell().innerText = d.amount;
   });
 
-  // 合計
-  const totalIncome = data.filter(d=>d.type==="収入").reduce((a,b)=>a+b.amount,0);
-  const totalExpense = data.filter(d=>d.type==="支出").reduce((a,b)=>a+b.amount,0);
+  // 合計計算
+  const totalIncome = data.filter(d => d.type === "収入").reduce((a, b) => a + b.amount, 0);
+  const totalExpense = data.filter(d => d.type === "支出").reduce((a, b) => a + b.amount, 0);
   totalIncomeEl.innerText = totalIncome + "円";
   totalExpenseEl.innerText = totalExpense + "円";
   balanceEl.innerText = (totalIncome - totalExpense) + "円";
@@ -53,15 +53,55 @@ function updateDisplay() {
   // グラフ更新
   const incomeData = {};
   const expenseData = {};
-  data.forEach(d=>{
-    if(d.type==="収入") incomeData[d.item] = (incomeData[d.item]||0)+d.amount;
-    if(d.type==="支出") expenseData[d.item] = (expenseData[d.item]||0)+d.amount;
+  data.forEach(d => {
+    if (d.type === "収入") incomeData[d.item] = (incomeData[d.item] || 0) + d.amount;
+    if (d.type === "支出") expenseData[d.item] = (expenseData[d.item] || 0) + d.amount;
   });
 
   incomeChart.data.labels = Object.keys(incomeData);
   incomeChart.data.datasets[0].data = Object.values(incomeData);
-  incomeChart.data.datasets[0].backgroundColor = Object.keys(incomeData).map(()=>`#16a085`);
+  incomeChart.data.datasets[0].backgroundColor = Object.keys(incomeData).map(() => "#16a085");
   incomeChart.update();
 
   expenseChart.data.labels = Object.keys(expenseData);
-  expenseChart.data.datasets[0].
+  expenseChart.data.datasets[0].data = Object.values(expenseData);
+  expenseChart.data.datasets[0].backgroundColor = Object.keys(expenseData).map(() => "#e74c3c");
+  expenseChart.update();
+}
+
+// スプレッドシートに送信
+function saveToSheet(date, type, item, amount) {
+  fetch(scriptURL, {
+    method: "POST",
+    body: JSON.stringify({ date, type, item, amount }),
+    headers: { 'Content-Type': 'application/json' }
+  })
+    .then(response => response.json())
+    .then(data => {
+      if (data.status === "success") alert("スプレッドシートに保存しました！");
+    })
+    .catch(error => console.error("Error:", error));
+}
+
+// フォーム送信処理
+form.addEventListener("submit", e => {
+  e.preventDefault();
+
+  const date = new Date().toLocaleDateString();
+  const type = document.getElementById("type").value;
+  const item = document.getElementById("item").value;
+  const amount = parseInt(document.getElementById("amount").value);
+
+  const entry = { date, type, item, amount };
+  data.push(entry);
+
+  updateDisplay();
+  saveToSheet(date, type, item, amount);
+
+  form.reset();
+});
+
+// ページロード時にグラフ初期化
+window.onload = () => {
+  initCharts();
+};
