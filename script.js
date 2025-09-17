@@ -1,73 +1,108 @@
-const form = document.getElementById("form");
-const list = document.getElementById("list");
-const totalIncome = document.getElementById("totalIncome");
-const totalExpense = document.getElementById("totalExpense");
-const balance = document.getElementById("balance");
+let records = [];
+let incomeChart, expenseChart;
 
-// 自分のGASのURLをここに貼る
-const GAS_URL = "https://script.google.com/macros/s/AKfycbytzvj-UQwOtd_WeCgmrlpE2Y9yjKhI7DlA-jZzXB3p57xDo1HIPelTR7kDxNHdQLaPkg/exec";
-
-let income = 0;
-let expense = 0;
-
-// Chart.js の設定
-const ctx = document.getElementById("myChart").getContext("2d");
-let chart = new Chart(ctx, {
-  type: "pie",
-  data: {
-    labels: ["収入", "支出"],
-    datasets: [{
-      data: [income, expense],
-      backgroundColor: ["#4CAF50", "#F44336"]
-    }]
-  }
+// 入力フォーム処理
+document.getElementById("recordForm").addEventListener("submit", function(e) {
+  e.preventDefault();
+  const item = document.getElementById("item").value;
+  const amount = Number(document.getElementById("amount").value);
+  const type = document.getElementById("type").value;
+  addRecord(item, amount, type);
+  this.reset();
 });
 
-// フォーム送信処理
-form.addEventListener("submit", function(e) {
-  e.preventDefault();
-
-  const item = document.getElementById("item").value;
-  const amount = parseInt(document.getElementById("amount").value);
-  const type = document.getElementById("type").value;
-
-  // ページ上の一覧に追加
-  const li = document.createElement("li");
-  li.textContent = `${item}: ${amount}円 (${type === "income" ? "収入" : "支出"})`;
-  list.appendChild(li);
-
-  // 合計を更新
-  if (type === "income") {
-    income += amount;
-  } else {
-    expense += amount;
-  }
+// データ追加
+function addRecord(item, amount, type) {
+  records.push({ item, amount, type });
   updateSummary();
-  updateChart();
+}
 
-  // 🔹 Googleスプレッドシートに送信
-  fetch(GAS_URL, {
+// 集計と表示更新
+function updateSummary() {
+  let summary = {};
+  records.forEach(r => {
+    let key = `${r.type}:${r.item}`;
+    if (!summary[key]) summary[key] = 0;
+    summary[key] += r.amount;
+  });
+
+  // 表を更新
+  let table = document.getElementById("summaryTable");
+  table.innerHTML = "<tr><th>区分</th><th>項目</th><th>金額</th></tr>";
+  for (let key in summary) {
+    let [type, item] = key.split(":");
+    let row = table.insertRow();
+    row.insertCell(0).innerText = type;
+    row.insertCell(1).innerText = item;
+    row.insertCell(2).innerText = summary[key] + "円";
+  }
+
+  // 収入と支出を分けて集計
+  let incomeData = {};
+  let expenseData = {};
+  for (let key in summary) {
+    let [type, item] = key.split(":");
+    if (type === "収入") {
+      incomeData[item] = summary[key];
+    } else if (type === "支出") {
+      expenseData[item] = summary[key];
+    }
+  }
+
+  // 収入グラフ
+  let incomeCtx = document.getElementById("incomeChart").getContext("2d");
+  if (incomeChart) incomeChart.destroy();
+  incomeChart = new Chart(incomeCtx, {
+    type: "pie",
+    data: {
+      labels: Object.keys(incomeData),
+      datasets: [{
+        data: Object.values(incomeData),
+        backgroundColor: ["#36a2eb", "#4bc0c0", "#9966ff", "#ff9f40", "#ffcd56"]
+      }]
+    }
+  });
+
+  // 支出グラフ
+  let expenseCtx = document.getElementById("expenseChart").getContext("2d");
+  if (expenseChart) expenseChart.destroy();
+  expenseChart = new Chart(expenseCtx, {
+    type: "pie",
+    data: {
+      labels: Object.keys(expenseData),
+      datasets: [{
+        data: Object.values(expenseData),
+        backgroundColor: ["#ff6384", "#ff9f40", "#36a2eb", "#4bc0c0", "#9966ff"]
+      }]
+    }
+  });
+
+  // 保存ボタンに処理を割り当て
+  document.getElementById("saveButton").onclick = function() {
+    saveToSheet(summary);
+  };
+}
+
+// スプレッドシートに保存
+function saveToSheet(summary) {
+  const today = new Date().toLocaleDateString("ja-JP");
+
+  let rows = [];
+  for (let key in summary) {
+    let [type, item] = key.split(":");
+    rows.push({
+      date: today,
+      item: item,
+      amount: summary[key],
+      type: type
+    });
+  }
+
+  fetch("YOUR_WEB_APP_URL", { https://script.google.com/macros/s/AKfycby3VrNFitYAzCdOw74r0E5nq7sfVwnWdLnO5fTsbBIUccKqDYaAwn4hLDE1i-vcZKUCmA/exec 
     method: "POST",
-    body: JSON.stringify({ item, amount, type })
+    body: JSON.stringify(rows)
   })
   .then(res => res.text())
-  .then(data => console.log("シートに保存:", data))
-  .catch(err => console.error("エラー:", err));
-
-  // フォームをリセット
-  form.reset();
-});
-
-// 集計を更新
-function updateSummary() {
-  totalIncome.textContent = income;
-  totalExpense.textContent = expense;
-  balance.textContent = income - expense;
+  .then(txt => alert("保存しました: " + txt))
+  .catch(err => alert("エラー: " + err));
 }
-
-// グラフを更新
-function updateChart() {
-  chart.data.datasets[0].data = [income, expense];
-  chart.update();
-}
-
