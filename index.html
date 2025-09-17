@@ -9,7 +9,23 @@
 <body>
   <h1>家計簿アプリ</h1>
 
-  <h2>入力フォーム</h2>
+  <!-- 合計カード -->
+  <div class="summary-cards">
+    <div class="card income-card">
+      <h2>収入合計</h2>
+      <p id="totalIncome">0円</p>
+    </div>
+    <div class="card expense-card">
+      <h2>支出合計</h2>
+      <p id="totalExpense">0円</p>
+    </div>
+    <div class="card balance-card">
+      <h2>残高</h2>
+      <p id="balance">0円</p>
+    </div>
+  </div>
+
+  <!-- 入力フォーム -->
   <form id="recordForm">
     <label>項目:
       <select id="item" required>
@@ -23,9 +39,9 @@
         <option value="お小遣い">お小遣い</option>
         <option value="その他">その他</option>
       </select>
-    </label><br>
+    </label>
 
-    <label>金額: <input type="number" id="amount" required></label><br>
+    <label>金額: <input type="number" id="amount" required></label>
 
     <label>
       区分:
@@ -33,12 +49,13 @@
         <option value="支出">支出</option>
         <option value="収入">収入</option>
       </select>
-    </label><br>
+    </label>
 
     <button type="submit">追加</button>
   </form>
 
-  <h2>集計結果</h2>
+  <!-- 集計表 -->
+  <h2>詳細</h2>
   <table id="summaryTable" border="1">
     <tr>
       <th>区分</th>
@@ -47,6 +64,7 @@
     </tr>
   </table>
 
+  <!-- グラフ -->
   <h2>収入グラフ</h2>
   <canvas id="incomeChart" width="400" height="400"></canvas>
 
