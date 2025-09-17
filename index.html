@@ -1,1 +1,40 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>家計簿アプリ</title>
+  <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+  <h1>家計簿アプリ</h1>
+
+  <!-- 入力フォーム -->
+  <form id="form">
+    <input type="text" id="item" placeholder="項目 (例: 食費)" required>
+    <input type="number" id="amount" placeholder="金額" required>
+    <select id="type">
+      <option value="income">収入</option>
+      <option value="expense">支出</option>
+    </select>
+    <button type="submit">追加</button>
+  </form>
+
+  <!-- 一覧表示 -->
+  <h2>記録一覧</h2>
+  <ul id="list"></ul>
+
+  <!-- 合計表示 -->
+  <h2>集計</h2>
+  <p>収入合計: <span id="totalIncome">0</span> 円</p>
+  <p>支出合計: <span id="totalExpense">0</span> 円</p>
+  <p>収支: <span id="balance">0</span> 円</p>
+
+  <!-- 円グラフ -->
+  <h2>収入・支出の割合</h2>
+  <canvas id="myChart" width="300" height="300"></canvas>
+
+  <script src="script.js"></script>
+</body>
+</html>
 
