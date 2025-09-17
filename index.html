@@ -9,32 +9,52 @@
 <body>
   <h1>家計簿アプリ</h1>
 
-  <!-- 入力フォーム -->
-  <form id="form">
-    <input type="text" id="item" placeholder="項目 (例: 食費)" required>
-    <input type="number" id="amount" placeholder="金額" required>
-    <select id="type">
-      <option value="income">収入</option>
-      <option value="expense">支出</option>
-    </select>
+  <h2>入力フォーム</h2>
+  <form id="recordForm">
+    <label>項目:
+      <select id="item" required>
+        <option value="食費">食費</option>
+        <option value="交通費">交通費</option>
+        <option value="娯楽">娯楽</option>
+        <option value="日用品">日用品</option>
+        <option value="家賃">家賃</option>
+        <option value="光熱費">光熱費</option>
+        <option value="給料">給料</option>
+        <option value="お小遣い">お小遣い</option>
+        <option value="その他">その他</option>
+      </select>
+    </label><br>
+
+    <label>金額: <input type="number" id="amount" required></label><br>
+
+    <label>
+      区分:
+      <select id="type">
+        <option value="支出">支出</option>
+        <option value="収入">収入</option>
+      </select>
+    </label><br>
+
     <button type="submit">追加</button>
   </form>
 
-  <!-- 一覧表示 -->
-  <h2>記録一覧</h2>
-  <ul id="list"></ul>
+  <h2>集計結果</h2>
+  <table id="summaryTable" border="1">
+    <tr>
+      <th>区分</th>
+      <th>項目</th>
+      <th>金額</th>
+    </tr>
+  </table>
 
-  <!-- 合計表示 -->
-  <h2>集計</h2>
-  <p>収入合計: <span id="totalIncome">0</span> 円</p>
-  <p>支出合計: <span id="totalExpense">0</span> 円</p>
-  <p>収支: <span id="balance">0</span> 円</p>
+  <h2>収入グラフ</h2>
+  <canvas id="incomeChart" width="400" height="400"></canvas>
 
-  <!-- 円グラフ -->
-  <h2>収入・支出の割合</h2>
-  <canvas id="myChart" width="300" height="300"></canvas>
+  <h2>支出グラフ</h2>
+  <canvas id="expenseChart" width="400" height="400"></canvas>
+
+  <button id="saveButton">スプレッドシートに保存</button>
 
   <script src="script.js"></script>
 </body>
 </html>
-
