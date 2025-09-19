@@ -95,3 +95,5 @@ form.addEventListener("submit", e => {
 });
 
 window.onload = () => initCharts();
+
+alert("保存結果: " + text);
