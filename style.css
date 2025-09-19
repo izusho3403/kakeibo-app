@@ -1,90 +1,77 @@
 body {
-  font-family: 'Segoe UI', 'Hiragino Sans', 'Noto Sans JP', sans-serif;
+  font-family: "Segoe UI", sans-serif;
+  background: linear-gradient(120deg, #84fab0, #8fd3f4);
   margin: 0;
   padding: 0;
-  background: linear-gradient(135deg, #ece9e6, #ffffff);
+}
+
+.container {
+  max-width: 500px;
+  margin: 60px auto;
+  background: #fff;
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 0px 5px 20px rgba(0,0,0,0.1);
+  animation: fadeIn 0.8s ease-in-out;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
   color: #333;
 }
 
-header {
-  background: #2c3e50;
-  color: #fff;
-  padding: 20px;
-  text-align: center;
-  font-size: 28px;
-  font-weight: bold;
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+.form-group {
+  margin-bottom: 15px;
 }
 
-main {
-  max-width: 900px;
-  margin: 40px auto;
-  padding: 20px;
-}
-
-form {
-  background: #fff;
-  padding: 30px;
-  border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-  margin-bottom: 40px;
-}
-
-form label {
+label {
   display: block;
-  margin-bottom: 12px;
-  font-weight: 600;
+  margin-bottom: 6px;
+  font-weight: bold;
+  color: #555;
 }
 
 input, select {
   width: 100%;
-  padding: 14px;
-  margin-top: 6px;
-  border: 1px solid #ccc;
-  border-radius: 8px;
-  font-size: 16px;
-  transition: all 0.2s;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #ddd;
+  font-size: 15px;
+  transition: 0.2s;
 }
 
 input:focus, select:focus {
-  border-color: #3498db;
-  box-shadow: 0 0 6px rgba(52, 152, 219, 0.3);
+  border-color: #4facfe;
   outline: none;
+  box-shadow: 0 0 5px rgba(79,172,254,0.3);
 }
 
-button {
+.btn {
   width: 100%;
-  padding: 14px;
-  margin-top: 20px;
-  background: #3498db;
+  padding: 12px;
+  background: linear-gradient(90deg, #4facfe, #00f2fe);
   color: #fff;
+  font-size: 16px;
   border: none;
-  border-radius: 8px;
-  font-size: 18px;
-  font-weight: bold;
+  border-radius: 12px;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: 0.3s;
 }
 
-button:hover {
-  background: #2980b9;
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0px 4px 10px rgba(0,0,0,0.2);
 }
 
-h2 {
-  margin-bottom: 20px;
+#message {
   text-align: center;
-  font-size: 22px;
-  color: #444;
+  margin-top: 15px;
+  font-size: 14px;
+  color: #333;
 }
 
-.chart-container {
-  background: #fff;
-  padding: 25px;
-  border-radius: 15px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-}
-
-canvas {
-  max-width: 100%;
-  height: auto;
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
