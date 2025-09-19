@@ -1,10 +1,7 @@
-// ここに自分のApps ScriptのURLを貼る
-const scriptURL = "https://script.google.com/macros/s/AKfycbwruEs7-BaL9HSmio152AFnvh-wlK4T5LLPx8DiDBJo-w90l02pu84mnqfnec9OylTfWQ/exec";
+// Apps ScriptのデプロイURLを貼る
+const scriptURL = "https://script.google.com/macros/s/AKfycbymnjeB25BWn0U-j0EmAdKCLDJ546jD3GYbnB76bKJDzWjpFyPVRLHGISuvXn4vD97M/exec";
 
-// データ管理用
 let data = [];
-
-// DOM
 const form = document.getElementById("recordForm");
 const table = document.getElementById("summaryTable");
 const totalIncomeEl = document.getElementById("totalIncome");
@@ -13,7 +10,7 @@ const balanceEl = document.getElementById("balance");
 
 let incomeChart, expenseChart;
 
-// 初期化
+// グラフ初期化
 function initCharts() {
   const incomeCtx = document.getElementById("incomeChart").getContext("2d");
   incomeChart = new Chart(incomeCtx, {
@@ -28,13 +25,10 @@ function initCharts() {
   });
 }
 
-// データ更新
+// 表示更新
 function updateDisplay() {
-  // 表の更新
   table.innerHTML = `
-    <tr>
-      <th>日付</th><th>区分</th><th>項目</th><th>金額</th>
-    </tr>`;
+    <tr><th>日付</th><th>区分</th><th>項目</th><th>金額</th></tr>`;
   data.forEach(d => {
     const row = table.insertRow();
     row.insertCell().innerText = d.date;
@@ -43,9 +37,9 @@ function updateDisplay() {
     row.insertCell().innerText = d.amount;
   });
 
-  // 合計計算
   const totalIncome = data.filter(d => d.type === "収入").reduce((a, b) => a + b.amount, 0);
   const totalExpense = data.filter(d => d.type === "支出").reduce((a, b) => a + b.amount, 0);
+
   totalIncomeEl.innerText = totalIncome + "円";
   totalExpenseEl.innerText = totalExpense + "円";
   balanceEl.innerText = (totalIncome - totalExpense) + "円";
@@ -60,12 +54,10 @@ function updateDisplay() {
 
   incomeChart.data.labels = Object.keys(incomeData);
   incomeChart.data.datasets[0].data = Object.values(incomeData);
-  incomeChart.data.datasets[0].backgroundColor = Object.keys(incomeData).map(() => "#16a085");
   incomeChart.update();
 
   expenseChart.data.labels = Object.keys(expenseData);
   expenseChart.data.datasets[0].data = Object.values(expenseData);
-  expenseChart.data.datasets[0].backgroundColor = Object.keys(expenseData).map(() => "#e74c3c");
   expenseChart.update();
 }
 
@@ -74,13 +66,14 @@ function saveToSheet(date, type, item, amount) {
   fetch(scriptURL, {
     method: "POST",
     body: JSON.stringify({ date, type, item, amount }),
-    headers: { 'Content-Type': 'application/json' }
+    headers: { "Content-Type": "application/json" }
   })
-    .then(response => response.json())
-    .then(data => {
-      if (data.status === "success") alert("スプレッドシートに保存しました！");
+    .then(response => response.text())
+    .then(text => {
+      console.log("サーバー応答:", text);
+      alert("保存結果: " + text);
     })
-    .catch(error => console.error("Error:", error));
+    .catch(error => console.error("送信エラー:", error));
 }
 
 // フォーム送信処理
@@ -101,7 +94,4 @@ form.addEventListener("submit", e => {
   form.reset();
 });
 
-// ページロード時にグラフ初期化
-window.onload = () => {
-  initCharts();
-};
+window.onload = () => initCharts();
