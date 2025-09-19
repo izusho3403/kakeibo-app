@@ -1,77 +1,87 @@
 <!DOCTYPE html>
-<html lang="ja">
+<html>
 <head>
   <meta charset="UTF-8">
   <title>家計簿アプリ</title>
-  <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>家計簿アプリ</h1>
+  <header>家計簿アプリ（GAS版）</header>
+  <main>
+    <form onsubmit="handleSubmit(event)">
+      <label>日付:
+        <input type="date" id="date" required>
+      </label>
+      <label>項目: 
+        <select id="item">
+          <option value="食費">🍚 食費</option>
+          <option value="交通費">🚌 交通費</option>
+          <option value="娯楽">🎮 娯楽</option>
+          <option value="給料">💰 給料</option>
+          <option value="その他">✨ その他</option>
+        </select>
+      </label>
+      <label>金額:
+        <input type="number" id="amount" placeholder="例: 5000" required>
+      </label>
+      <label>種類:
+        <select id="type">
+          <option value="収入">📈 収入</option>
+          <option value="支出">📉 支出</option>
+        </select>
+      </label>
+      <button type="submit">💾 保存する</button>
+    </form>
 
-  <!-- 合計カード -->
-  <div class="summary-cards">
-    <div class="card income-card">
-      <h2>収入合計</h2>
-      <p id="totalIncome">0円</p>
+    <div class="chart-container">
+      <h2>📊 項目ごとの集計</h2>
+      <canvas id="summaryChart"></canvas>
     </div>
-    <div class="card expense-card">
-      <h2>支出合計</h2>
-      <p id="totalExpense">0円</p>
-    </div>
-    <div class="card balance-card">
-      <h2>残高</h2>
-      <p id="balance">0円</p>
-    </div>
-  </div>
+  </main>
 
-  <!-- 入力フォーム -->
-  <form id="recordForm">
-    <label>項目:
-      <select id="item" required>
-        <option value="食費">食費</option>
-        <option value="交通費">交通費</option>
-        <option value="娯楽">娯楽</option>
-        <option value="日用品">日用品</option>
-        <option value="家賃">家賃</option>
-        <option value="光熱費">光熱費</option>
-        <option value="給料">給料</option>
-        <option value="お小遣い">お小遣い</option>
-        <option value="その他">その他</option>
-      </select>
-    </label>
+  <script>
+    function handleSubmit(e) {
+      e.preventDefault();
+      const data = {
+        date: document.getElementById("date").value,
+        item: document.getElementById("item").value,
+        amount: document.getElementById("amount").value,
+        type: document.getElementById("type").value
+      };
+      google.script.run.withSuccessHandler(() => {
+        alert("✅ 保存しました！");
+        loadSummary();
+      }).saveData(data);
+    }
 
-    <label>金額: <input type="number" id="amount" required></label>
+    function loadSummary() {
+      google.script.run.withSuccessHandler(summary => {
+        const labels = Object.keys(summary);
+        const incomeData = labels.map(l => summary[l].income);
+        const expenseData = labels.map(l => summary[l].expense);
 
-    <label>
-      区分:
-      <select id="type">
-        <option value="支出">支出</option>
-        <option value="収入">収入</option>
-      </select>
-    </label>
+        const ctx = document.getElementById("summaryChart").getContext("2d");
+        new Chart(ctx, {
+          type: "bar",
+          data: {
+            labels: labels,
+            datasets: [
+              { label: "収入", data: incomeData, backgroundColor: "rgba(46, 204, 113, 0.7)" },
+              { label: "支出", data: expenseData, backgroundColor: "rgba(231, 76, 60, 0.7)" }
+            ]
+          },
+          options: {
+            responsive: true,
+            plugins: {
+              legend: { position: 'top' }
+            }
+          }
+        });
+      }).getSummary();
+    }
 
-    <button type="submit">追加</button>
-  </form>
-
-  <!-- 集計表 -->
-  <h2>詳細</h2>
-  <table id="summaryTable" border="1">
-    <tr>
-      <th>日付</th>
-      <th>区分</th>
-      <th>項目</th>
-      <th>金額</th>
-    </tr>
-  </table>
-
-  <!-- グラフ -->
-  <h2>収入グラフ</h2>
-  <canvas id="incomeChart" width="400" height="400"></canvas>
-
-  <h2>支出グラフ</h2>
-  <canvas id="expenseChart" width="400" height="400"></canvas>
-
-  <script src="script.js"></script>
+    window.onload = loadSummary;
+  </script>
 </body>
 </html>
