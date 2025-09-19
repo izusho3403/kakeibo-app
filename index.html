@@ -1,87 +1,44 @@
 <!DOCTYPE html>
-<html>
+<html lang="ja">
 <head>
   <meta charset="UTF-8">
   <title>家計簿アプリ</title>
-  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <header>家計簿アプリ（GAS版）</header>
-  <main>
-    <form onsubmit="handleSubmit(event)">
-      <label>日付:
+  <div class="container">
+    <h1>家計簿入力フォーム</h1>
+
+    <form id="kakeibo-form">
+      <div class="form-group">
+        <label>日付</label>
         <input type="date" id="date" required>
-      </label>
-      <label>項目: 
-        <select id="item">
-          <option value="食費">🍚 食費</option>
-          <option value="交通費">🚌 交通費</option>
-          <option value="娯楽">🎮 娯楽</option>
-          <option value="給料">💰 給料</option>
-          <option value="その他">✨ その他</option>
+      </div>
+
+      <div class="form-group">
+        <label>項目</label>
+        <input type="text" id="item" placeholder="例: 食費" required>
+      </div>
+
+      <div class="form-group">
+        <label>金額</label>
+        <input type="number" id="amount" placeholder="例: 1200" required>
+      </div>
+
+      <div class="form-group">
+        <label>種別</label>
+        <select id="type" required>
+          <option value="支出">支出</option>
+          <option value="収入">収入</option>
         </select>
-      </label>
-      <label>金額:
-        <input type="number" id="amount" placeholder="例: 5000" required>
-      </label>
-      <label>種類:
-        <select id="type">
-          <option value="収入">📈 収入</option>
-          <option value="支出">📉 支出</option>
-        </select>
-      </label>
-      <button type="submit">💾 保存する</button>
+      </div>
+
+      <button type="submit" class="btn">保存する</button>
     </form>
 
-    <div class="chart-container">
-      <h2>📊 項目ごとの集計</h2>
-      <canvas id="summaryChart"></canvas>
-    </div>
-  </main>
+    <p id="message"></p>
+  </div>
 
-  <script>
-    function handleSubmit(e) {
-      e.preventDefault();
-      const data = {
-        date: document.getElementById("date").value,
-        item: document.getElementById("item").value,
-        amount: document.getElementById("amount").value,
-        type: document.getElementById("type").value
-      };
-      google.script.run.withSuccessHandler(() => {
-        alert("✅ 保存しました！");
-        loadSummary();
-      }).saveData(data);
-    }
-
-    function loadSummary() {
-      google.script.run.withSuccessHandler(summary => {
-        const labels = Object.keys(summary);
-        const incomeData = labels.map(l => summary[l].income);
-        const expenseData = labels.map(l => summary[l].expense);
-
-        const ctx = document.getElementById("summaryChart").getContext("2d");
-        new Chart(ctx, {
-          type: "bar",
-          data: {
-            labels: labels,
-            datasets: [
-              { label: "収入", data: incomeData, backgroundColor: "rgba(46, 204, 113, 0.7)" },
-              { label: "支出", data: expenseData, backgroundColor: "rgba(231, 76, 60, 0.7)" }
-            ]
-          },
-          options: {
-            responsive: true,
-            plugins: {
-              legend: { position: 'top' }
-            }
-          }
-        });
-      }).getSummary();
-    }
-
-    window.onload = loadSummary;
-  </script>
+  <script src="script.js"></script>
 </body>
 </html>
