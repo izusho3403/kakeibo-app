@@ -1,5 +1,5 @@
 // ここに自分のApps ScriptのURLを貼る
-const scriptURL = "https://script.google.com/macros/s/AKfycby3VrNFitYAzCdOw74r0E5nq7sfVwnWdLnO5fTsbBIUccKqDYaAwn4hLDE1i-vcZKUCmA/exec";
+const scriptURL = "https://script.google.com/macros/s/AKfycbwruEs7-BaL9HSmio152AFnvh-wlK4T5LLPx8DiDBJo-w90l02pu84mnqfnec9OylTfWQ/exec";
 
 // データ管理用
 let data = [];
